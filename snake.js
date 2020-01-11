@@ -39,11 +39,15 @@ class Snake {
   }
 
   get head() {
-    return this.positions[this.positions.length - 1];
+    return this.positions[this.positions.length - 1].slice();
   }
 
   get species() {
     return this.type;
+  }
+
+  get snake() {
+    return this.positions.slice();
   }
 
   turnLeft() {
@@ -73,6 +77,18 @@ class Food {
   }
 }
 
+const getNewFoodPosition = function (width, height) {
+  const newFoodX = Math.floor(Math.random() * width);
+  const newFoodY = Math.floor(Math.random() * height);
+  return new Food(newFoodX, newFoodY);
+}
+
+const getNewSnakeTail = function (snake) {
+  const [headX, headY] = snake.positions[snake.positions.length - 1];
+  const [deltaX, deltaY] = snake.direction.delta;
+  return [headX + deltaX, headY + deltaY];
+};
+
 class Game {
   constructor(size, snake, food) {
     [this.width, this.height] = size;
@@ -82,8 +98,9 @@ class Game {
 
   update() {
     this.snake.move();
-    if (this.snake.head.x === this.food.position[0] && this.snake.head.y === this.food.position[1]) {
-      this.food = new Food(30, 30)
+    if (arePositionsEqual(this.snake.head, this.food.position)) {
+      this.food = getNewFoodPosition(this.width, this.height);
+      this.snake.positions.push(getNewSnakeTail(this.snake));
     }
   }
 }
@@ -115,6 +132,12 @@ const createGrids = function () {
   }
 };
 
+const arePositionsEqual = function (position1, position2) {
+  const equalityOfX = (position1[0] == position2[0]);
+  const equalityOfY = (position1[1] == position2[1]);
+  return equalityOfX && equalityOfY;
+};
+
 const eraseTail = function (snake) {
   let [colId, rowId] = snake.previousTail;
   const cell = getCell(colId, rowId);
@@ -138,7 +161,7 @@ const drawFood = function (food) {
   const [colId, rowId] = food.position
   const cell = getCell(colId, rowId);
   cell.classList.add('food')
-}
+};
 
 const handleKeyPress = snake => {
   const moves = {
@@ -185,7 +208,7 @@ const main = function () {
     'snake'
   );
   const food = new Food(10, 10);
-  const game = new Game([800, 480], snake, food);
+  const game = new Game([100, 60], snake, food);
   setup(game);
   setInterval(() => {
     gameLoop(game);
