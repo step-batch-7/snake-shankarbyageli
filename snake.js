@@ -1,3 +1,5 @@
+'use strict';
+
 const EAST = 0;
 const NORTH = 1;
 const WEST = 2;
@@ -25,6 +27,13 @@ class Direction {
     this.heading = (this.heading + 1) % 4;
   }
 }
+
+
+const arePositionsEqual = function (position1, position2) {
+  const equalityOfX = (position1[0] == position2[0]);
+  const equalityOfY = (position1[1] == position2[1]);
+  return equalityOfX && equalityOfY;
+};
 
 class Snake {
   constructor(positions, direction, type) {
@@ -79,6 +88,7 @@ class Snake {
   }
 }
 
+
 class Food {
   constructor(colId, rowId) {
     this.x = colId;
@@ -90,17 +100,16 @@ class Food {
   }
 }
 
+
+const isNotInRange = function (value, [min, max]) {
+  return value < min || value > max;
+}
+
 const getNewFood = function (width, height) {
   const newFoodX = Math.floor(Math.random() * width);
   const newFoodY = Math.floor(Math.random() * height);
   return new Food(newFoodX, newFoodY);
 }
-
-const getNewSnakeTail = function (snake) {
-  const [headX, headY] = snake.positions[snake.positions.length - 1];
-  const [deltaX, deltaY] = snake.direction.delta;
-  return [headX + deltaX, headY + deltaY];
-};
 
 class Game {
   constructor(size, snake, food) {
@@ -135,11 +144,9 @@ class Game {
 
   isTouchedBoundary() {
     const snakeHead = this.snake.head;
-    const isTopTouch = snakeHead[0] < 0;
-    const isLeftTouch = snakeHead[1] < 0;
-    const isRightTouch = snakeHead[0] > (this.width - 1);
-    const isBottomTouch = snakeHead[1] > (this.height - 1);
-    return isTopTouch || isLeftTouch || isRightTouch || isBottomTouch;
+    const isTouchedSide = isNotInRange(snakeHead[0], [0, this.width - 1]);
+    const isTouchedTopDown = isNotInRange(snakeHead[1], [0, this.height - 1]);
+    return isTouchedSide || isTouchedTopDown;
   }
 
   isSnakeDied() {
@@ -159,7 +166,8 @@ class Game {
   }
 }
 
-const getGrid = () => document.getElementById(GRID_ID);
+
+const getGrid = GRID_ID => document.getElementById(GRID_ID);
 const getCellId = (colId, rowId) => colId + '_' + rowId;
 
 const getCell = (colId, rowId) =>
@@ -172,19 +180,13 @@ const createCell = function (grid, colId, rowId) {
   grid.appendChild(cell);
 };
 
-const createGrids = function ([width, height]) {
-  const grid = getGrid();
+const createGrids = function ([width, height], GRID_ID) {
+  const grid = getGrid(GRID_ID);
   for (let y = 0; y < height; y++) {
     for (let x = 0; x < width; x++) {
       createCell(grid, x, y);
     }
   }
-};
-
-const arePositionsEqual = function (position1, position2) {
-  const equalityOfX = (position1[0] == position2[0]);
-  const equalityOfY = (position1[1] == position2[1]);
-  return equalityOfX && equalityOfY;
 };
 
 const eraseFoodAndTail = function (game) {
@@ -236,16 +238,15 @@ const gameLoop = function (game) {
   drawSnakeAndFood(newState);
 };
 
-const setup = game => {
+const setup = (game, GRID_ID) => {
   const gameState = game.getState()
   attachEventListeners(game);
-  createGrids(game.size);
+  createGrids(game.size, GRID_ID);
   drawSnakeAndFood(gameState);
 };
 
-const GRID_ID = 'grid';
 const main = function () {
-
+  const GRID_ID = 'grid';
   const snake = new Snake(
     [
       [40, 25],
@@ -257,7 +258,7 @@ const main = function () {
   );
   const food = new Food(10, 10);
   const game = new Game([100, 60], snake, food);
-  setup(game);
+  setup(game, GRID_ID);
   setInterval(() => {
     gameLoop(game);
   }, 100);
