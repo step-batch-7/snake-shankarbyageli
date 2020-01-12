@@ -26,3 +26,8 @@ h1 {
 .food {
   background-color: red;
 }
+
+#score {
+  width : 1100px;
+  text-align: right;
+}

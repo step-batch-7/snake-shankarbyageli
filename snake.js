@@ -41,7 +41,6 @@ class Snake {
   state() {
     const state = {
       position: this.positions.slice(),
-      direction: this.direction,
       tail: this.previousTail.slice(),
       type: this.type
     }
@@ -61,6 +60,22 @@ class Snake {
     this.previousTail = this.positions.shift();
     const [deltaX, deltaY] = this.direction.delta;
     this.positions.push([headX + deltaX, headY + deltaY]);
+  }
+
+  grow() {
+    const [headX, headY] = this.positions[this.positions.length - 1];
+    const [deltaX, deltaY] = this.direction.delta;
+    const tail = [headX + deltaX, headY + deltaY];
+    this.positions.push(tail);
+  }
+
+  isBodyTouch() {
+    for (let idx = 0; idx < (this.positions.length - 1); idx++) {
+      if (arePositionsEqual(this.head, this.positions[idx])) {
+        return true;
+      }
+    }
+    return false;
   }
 }
 
@@ -92,12 +107,20 @@ class Game {
     [this.width, this.height] = size;
     this.snake = snake;
     this.food = food;
+    this.isOver = false;
+    this.score = 0
+  }
+
+  get size() {
+    return [this.width, this.height];
   }
 
   getState() {
     return {
+      isOver: this.isOver,
       snake: this.snake.state(),
-      food: this.food.position
+      food: this.food.position,
+      score: this.score
     }
   }
 
@@ -110,19 +133,31 @@ class Game {
     }
   }
 
+  isTouchedBoundary() {
+    const snakeHead = this.snake.head;
+    const isTopTouch = snakeHead[0] < 0;
+    const isLeftTouch = snakeHead[1] < 0;
+    const isRightTouch = snakeHead[0] > (this.width - 1);
+    const isBottomTouch = snakeHead[1] > (this.height - 1);
+    return isTopTouch || isLeftTouch || isRightTouch || isBottomTouch;
+  }
+
+  isSnakeDied() {
+    return this.isTouchedBoundary() || this.snake.isBodyTouch();
+  }
+
   update() {
-    this.snake.move();
+    if (this.isSnakeDied()) {
+      this.isOver = true;
+    }
     if (arePositionsEqual(this.snake.head, this.food.position)) {
       this.food = getNewFood(this.width, this.height);
-      this.snake.positions.push(getNewSnakeTail(this.snake));
+      this.snake.grow();
+      this.score += 5;
     }
+    this.snake.move();
   }
 }
-
-const NUM_OF_COLS = 100;
-const NUM_OF_ROWS = 60;
-
-const GRID_ID = 'grid';
 
 const getGrid = () => document.getElementById(GRID_ID);
 const getCellId = (colId, rowId) => colId + '_' + rowId;
@@ -137,10 +172,10 @@ const createCell = function (grid, colId, rowId) {
   grid.appendChild(cell);
 };
 
-const createGrids = function () {
+const createGrids = function ([width, height]) {
   const grid = getGrid();
-  for (let y = 0; y < NUM_OF_ROWS; y++) {
-    for (let x = 0; x < NUM_OF_COLS; x++) {
+  for (let y = 0; y < height; y++) {
+    for (let x = 0; x < width; x++) {
       createCell(grid, x, y);
     }
   }
@@ -185,21 +220,32 @@ const attachEventListeners = game => {
   document.body.onkeydown = handleKeyPress.bind(null, game);
 };
 
+const displayScore = function (score) {
+  document.getElementById('score').innerText = `Score : ${score}`;
+}
+
 const gameLoop = function (game) {
-  eraseFoodAndTail(game.getState());
-  game.update();
   const gameState = game.getState();
-  drawSnakeAndFood(gameState);
+  if (gameState.isOver) {
+    document.location.href = "gameOver.html";
+  }
+  eraseFoodAndTail(gameState);
+  game.update();
+  const newState = game.getState();
+  displayScore(newState.score);
+  drawSnakeAndFood(newState);
 };
 
 const setup = game => {
   const gameState = game.getState()
   attachEventListeners(game);
-  createGrids();
+  createGrids(game.size);
   drawSnakeAndFood(gameState);
 };
 
+const GRID_ID = 'grid';
 const main = function () {
+
   const snake = new Snake(
     [
       [40, 25],
@@ -214,5 +260,5 @@ const main = function () {
   setup(game);
   setInterval(() => {
     gameLoop(game);
-  }, 200);
+  }, 100);
 };
