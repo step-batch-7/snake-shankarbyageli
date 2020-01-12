@@ -30,9 +30,9 @@ class Direction {
 
 
 const arePositionsEqual = function (position1, position2) {
-  const equalityOfX = (position1[0] == position2[0]);
-  const equalityOfY = (position1[1] == position2[1]);
-  return equalityOfX && equalityOfY;
+  const isColIdEqual = (position1[0] == position2[0]);
+  const isRowIdEqual = (position1[1] == position2[1]);
+  return isColIdEqual && isRowIdEqual;
 };
 
 class Snake {
@@ -91,12 +91,12 @@ class Snake {
 
 class Food {
   constructor(colId, rowId) {
-    this.x = colId;
-    this.y = rowId;
+    this.colId = colId;
+    this.rowId = rowId;
   }
 
   get position() {
-    return [this.x, this.y];
+    return [this.colId, this.rowId];
   }
 }
 
@@ -106,9 +106,9 @@ const isNotInRange = function (value, [min, max]) {
 }
 
 const getNewFood = function (width, height) {
-  const newFoodX = Math.floor(Math.random() * width);
-  const newFoodY = Math.floor(Math.random() * height);
-  return new Food(newFoodX, newFoodY);
+  const colId = Math.floor(Math.random() * width);
+  const rowId = Math.floor(Math.random() * height);
+  return new Food(colId, rowId);
 }
 
 class Game {
@@ -144,9 +144,9 @@ class Game {
 
   isTouchedBoundary() {
     const snakeHead = this.snake.head;
-    const isTouchedSide = isNotInRange(snakeHead[0], [0, this.width - 1]);
+    const isTouchedSides = isNotInRange(snakeHead[0], [0, this.width - 1]);
     const isTouchedTopDown = isNotInRange(snakeHead[1], [0, this.height - 1]);
-    return isTouchedSide || isTouchedTopDown;
+    return isTouchedSides || isTouchedTopDown;
   }
 
   isSnakeDied() {
@@ -186,9 +186,9 @@ const createCell = function (grid, colId, rowId) {
 
 const createGrids = function ([width, height], GRID_ID) {
   const grid = getGrid(GRID_ID);
-  for (let y = 0; y < height; y++) {
-    for (let x = 0; x < width; x++) {
-      createCell(grid, x, y);
+  for (let rowId = 0; rowId < height; rowId++) {
+    for (let colId = 0; colId < width; colId++) {
+      createCell(grid, colId, rowId);
     }
   }
 };
@@ -197,6 +197,7 @@ const eraseFoodAndTail = function (game) {
   let [colId, rowId] = game.snake.tail;
   let cell = getCell(colId, rowId);
   cell.classList.remove(game.snake.type);
+
   [colId, rowId] = game.food;
   cell = getCell(colId, rowId);
   cell.classList.remove('food');
