@@ -153,11 +153,16 @@ class Game {
     return this.isTouchedBoundary() || this.snake.isBodyTouch();
   }
 
+  isFoodEaten() {
+    return arePositionsEqual(this.snake.head, this.food.position)
+  }
+
   update() {
     if (this.isSnakeDied()) {
       this.isOver = true;
+      return;
     }
-    if (arePositionsEqual(this.snake.head, this.food.position)) {
+    if (this.isFoodEaten()) {
       this.food = getNewFood(this.width, this.height);
       this.snake.grow();
       this.score += 5;
@@ -165,7 +170,6 @@ class Game {
     this.snake.move();
   }
 }
-
 
 const getGrid = GRID_ID => document.getElementById(GRID_ID);
 const getCellId = (colId, rowId) => colId + '_' + rowId;
