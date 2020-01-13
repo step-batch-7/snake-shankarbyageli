@@ -4,6 +4,12 @@ const isNotInRange = function (value, [min, max]) {
   return value < min || value > max;
 }
 
+const arePositionsEqual = function (position1, position2) {
+  const isColIdEqual = (position1[0] == position2[0]);
+  const isRowIdEqual = (position1[1] == position2[1]);
+  return isColIdEqual && isRowIdEqual;
+};
+
 const getNewFood = function (width, height) {
   const colId = Math.floor(Math.random() * width);
   const rowId = Math.floor(Math.random() * height);

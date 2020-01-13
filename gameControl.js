@@ -5,12 +5,6 @@ const NORTH = 1;
 const WEST = 2;
 const SOUTH = 3;
 
-const arePositionsEqual = function (position1, position2) {
-  const isColIdEqual = (position1[0] == position2[0]);
-  const isRowIdEqual = (position1[1] == position2[1]);
-  return isColIdEqual && isRowIdEqual;
-};
-
 const getGrid = GRID_ID => document.getElementById(GRID_ID);
 const getCellId = (colId, rowId) => colId + '_' + rowId;
 
