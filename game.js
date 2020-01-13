@@ -10,10 +10,12 @@ const arePositionsEqual = function (position1, position2) {
   return isColIdEqual && isRowIdEqual;
 };
 
-const getNewFood = function (width, height) {
+const getNewFood = function (width, height, score) {
   const colId = Math.floor(Math.random() * width);
   const rowId = Math.floor(Math.random() * height);
-  return new Food(colId, rowId);
+  const type = score % 45 === 0 ? 'special' : 'normal';
+  const points = type === 'special' ? 20 : 5;
+  return new Food(colId, rowId, type, points);
 }
 
 class Game {
@@ -29,11 +31,11 @@ class Game {
     return [this.width, this.height];
   }
 
-  getState() {
+  state() {
     return {
       isOver: this.isOver,
       snake: this.snake.state(),
-      food: this.food.position,
+      food: this.food.state(),
       score: this.score
     }
   }
@@ -57,10 +59,11 @@ class Game {
       this.isOver = true;
       return;
     }
-    if (this.snake.ateFood(this.food.position)) {
-      this.food = getNewFood(this.width, this.height);
+    const food = this.food.state();
+    if (this.snake.ateFood(food.position)) {
+      this.food = getNewFood(this.width, this.height, this.score);
       this.snake.grow();
-      this.score += 5;
+      this.score += food.points;
     }
     this.snake.move();
   }

@@ -32,9 +32,9 @@ const eraseFoodAndTail = function (game) {
   let cell = getCell(colId, rowId);
   cell.classList.remove(game.snake.type);
 
-  [colId, rowId] = game.food;
+  [colId, rowId] = game.food.position;
   cell = getCell(colId, rowId);
-  cell.classList.remove('food');
+  cell.classList.remove(game.food.type);
 };
 
 const drawSnakeAndFood = function (game) {
@@ -42,9 +42,9 @@ const drawSnakeAndFood = function (game) {
     const cell = getCell(colId, rowId);
     cell.classList.add(game.snake.type);
   });
-  const [colId, rowId] = game.food;
+  const [colId, rowId] = game.food.position;
   const cell = getCell(colId, rowId);
-  cell.classList.add('food')
+  cell.classList.add(game.food.type);
 };
 
 const handleKeyPress = game => {
@@ -66,20 +66,20 @@ const displayScore = function (score) {
 }
 
 const gameLoop = function (game, interval) {
-  const gameState = game.getState();
+  const gameState = game.state();
   if (gameState.isOver) {
     clearInterval(interval);
     alert("Game Over!")
   }
   eraseFoodAndTail(gameState);
   game.update();
-  const newState = game.getState();
+  const newState = game.state();
   displayScore(newState.score);
   drawSnakeAndFood(newState);
 };
 
 const setup = (game, GRID_ID) => {
-  const gameState = game.getState()
+  const gameState = game.state()
   attachEventListeners(game);
   createGrids(game.size, GRID_ID);
   drawSnakeAndFood(gameState);
@@ -96,7 +96,7 @@ const main = function () {
     new Direction(EAST),
     'snake'
   );
-  const food = new Food(10, 10);
+  const food = new Food(10, 10, 'normal', 5);
   const game = new Game([100, 60], snake, food);
   setup(game, GRID_ID);
   const gameInterval = setInterval(() => {

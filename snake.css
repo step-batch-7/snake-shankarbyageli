@@ -23,8 +23,12 @@ h1 {
   background-color: gray;
 }
  
-.food {
+.normal {
   background-color: red;
+}
+
+.special {
+  background-image: linear-gradient(#56ab2f, #a8e063);
 }
 
 #score {
