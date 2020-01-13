@@ -13,8 +13,7 @@ const arePositionsEqual = function (position1, position2) {
 const getNewFood = function (width, height, score) {
   const colId = Math.floor(Math.random() * width);
   const rowId = Math.floor(Math.random() * height);
-  const type = score % 45 === 0 ? 'special' : 'normal';
-  const points = type === 'special' ? 20 : 5;
+  const [type, points] = score % 45 === 0 ? ['special', 20] : ['normal', 5];
   return new Food(colId, rowId, type, points);
 }
 
