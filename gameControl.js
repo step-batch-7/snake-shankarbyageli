@@ -69,7 +69,7 @@ const gameLoop = function (game, interval) {
   const gameState = game.getState();
   if (gameState.isOver) {
     clearInterval(interval);
-    document.write("<h1 style='text-align: center'> Game Over! </h1>");
+    alert("Game Over!")
   }
   eraseFoodAndTail(gameState);
   game.update();

@@ -48,20 +48,8 @@ class Game {
     }
   }
 
-  isTouchedBoundary() {
-    const { position } = this.snake.head();
-    const isTouchedSides = isNotInRange(position[0], [0, this.width - 1]);
-    const isTouchedTopDown = isNotInRange(position[1], [0, this.height - 1]);
-    return isTouchedSides || isTouchedTopDown;
-  }
-
   isSnakeDied() {
-    return this.isTouchedBoundary() || this.snake.isBodyTouch();
-  }
-
-  isFoodEaten() {
-    const { position } = this.snake.head();
-    return arePositionsEqual(position, this.food.position)
+    return this.snake.isOnLine(this.width, this.height) || this.snake.isBodyTouch();
   }
 
   update() {
@@ -69,7 +57,7 @@ class Game {
       this.isOver = true;
       return;
     }
-    if (this.isFoodEaten()) {
+    if (this.snake.ateFood(this.food.position)) {
       this.food = getNewFood(this.width, this.height);
       this.snake.grow();
       this.score += 5;

@@ -37,6 +37,10 @@ class Snake {
     this.previousTail = this.positions.shift();
   }
 
+  ateFood(food) {
+    return arePositionsEqual(food, this.head().position);
+  }
+
   grow() {
     const [headX, headY] = this.positions[this.positions.length - 1];
     const [deltaX, deltaY] = this.direction.delta;
@@ -52,5 +56,12 @@ class Snake {
       }
     }
     return false;
+  }
+
+  isOnLine(width, height) {
+    const head = this.head().position;
+    const isTouchedSides = isNotInRange(head[0], [0, width - 1]);
+    const isTouchedTopDown = isNotInRange(head[1], [0, height - 1]);
+    return isTouchedSides || isTouchedTopDown;
   }
 }
