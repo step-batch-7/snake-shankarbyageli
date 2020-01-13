@@ -15,6 +15,10 @@ class Direction {
     this.deltas[SOUTH] = [0, 1];
   }
 
+  get head() {
+    return this.heading;
+  }
+
   get delta() {
     return this.deltas[this.heading];
   }
@@ -43,8 +47,11 @@ class Snake {
     this.previousTail = [0, 0];
   }
 
-  get head() {
-    return this.positions[this.positions.length - 1].slice();
+  head() {
+    return {
+      position: this.positions[this.positions.length - 1].slice(),
+      direction: this.direction.head
+    }
   }
 
   state() {
@@ -65,10 +72,8 @@ class Snake {
   }
 
   move() {
-    const [headX, headY] = this.positions[this.positions.length - 1];
+    this.grow();
     this.previousTail = this.positions.shift();
-    const [deltaX, deltaY] = this.direction.delta;
-    this.positions.push([headX + deltaX, headY + deltaY]);
   }
 
   grow() {
@@ -79,8 +84,9 @@ class Snake {
   }
 
   isBodyTouch() {
+    const headPosition = this.head().position;
     for (let idx = 0; idx < (this.positions.length - 1); idx++) {
-      if (arePositionsEqual(this.head, this.positions[idx])) {
+      if (arePositionsEqual(headPosition, this.positions[idx])) {
         return true;
       }
     }
@@ -133,19 +139,20 @@ class Game {
     }
   }
 
-  turnSnake(direction) {
-    if (this.snake.direction.heading === ((direction + 3) % 4)) {
+  turnSnake(turnDirection) {
+    const { direction } = this.snake.head();
+    if (direction === ((turnDirection + 3) % 4)) {
       this.snake.turnLeft();
     }
-    if (this.snake.direction.heading === ((direction + 1) % 4)) {
+    if (direction === ((turnDirection + 1) % 4)) {
       this.snake.turnRight();
     }
   }
 
   isTouchedBoundary() {
-    const snakeHead = this.snake.head;
-    const isTouchedSides = isNotInRange(snakeHead[0], [0, this.width - 1]);
-    const isTouchedTopDown = isNotInRange(snakeHead[1], [0, this.height - 1]);
+    const { position } = this.snake.head();
+    const isTouchedSides = isNotInRange(position[0], [0, this.width - 1]);
+    const isTouchedTopDown = isNotInRange(position[1], [0, this.height - 1]);
     return isTouchedSides || isTouchedTopDown;
   }
 
@@ -154,7 +161,8 @@ class Game {
   }
 
   isFoodEaten() {
-    return arePositionsEqual(this.snake.head, this.food.position)
+    const { position } = this.snake.head();
+    return arePositionsEqual(position, this.food.position)
   }
 
   update() {
@@ -231,10 +239,11 @@ const displayScore = function (score) {
   document.getElementById('score').innerText = `Score : ${score}`;
 }
 
-const gameLoop = function (game) {
+const gameLoop = function (game, interval) {
   const gameState = game.getState();
   if (gameState.isOver) {
-    document.location.href = "gameOver.html";
+    clearInterval(interval);
+    document.write("<h1 style='text-align: center'> Game Over! </h1>");
   }
   eraseFoodAndTail(gameState);
   game.update();
@@ -264,7 +273,7 @@ const main = function () {
   const food = new Food(10, 10);
   const game = new Game([100, 60], snake, food);
   setup(game, GRID_ID);
-  setInterval(() => {
-    gameLoop(game);
+  const gameInterval = setInterval(() => {
+    gameLoop(game, gameInterval);
   }, 100);
 };
