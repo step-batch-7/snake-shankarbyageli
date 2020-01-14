@@ -67,7 +67,7 @@ const displayScore = function (score) {
 
 const gameLoop = function (game, interval) {
   const gameState = game.state();
-  if (gameState.isOver) {
+  if (game.isOver()) {
     clearInterval(interval);
     alert("Game Over!")
   }

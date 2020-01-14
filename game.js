@@ -22,7 +22,6 @@ class Game {
     [this.width, this.height] = size;
     this.snake = snake;
     this.food = food;
-    this.isOver = false;
     this.score = 0
   }
 
@@ -32,7 +31,6 @@ class Game {
 
   state() {
     return {
-      isOver: this.isOver,
       snake: this.snake.state(),
       food: this.food.state(),
       score: this.score
@@ -49,19 +47,17 @@ class Game {
     }
   }
 
-  isSnakeDied() {
+  isOver() {
     return this.snake.isOnLine(this.width, this.height) || this.snake.isBodyTouch();
   }
 
   update() {
-    if (this.isSnakeDied()) {
-      this.isOver = true;
-      return;
-    }
     const food = this.food.state();
     if (this.snake.ateFood(food.position)) {
       this.food = getNewFood(this.width, this.height, this.score);
-      this.snake.grow();
+      if (food.type === 'normal') {
+        this.snake.grow();
+      }
       this.score += food.points;
     }
     this.snake.move();
