@@ -2,7 +2,7 @@
 
 const isNotInRange = function (value, [min, max]) {
   return value < min || value > max;
-}
+};
 
 const arePositionsEqual = function (position1, position2) {
   const isColIdEqual = (position1[0] == position2[0]);
@@ -10,17 +10,22 @@ const arePositionsEqual = function (position1, position2) {
   return isColIdEqual && isRowIdEqual;
 };
 
+const randomNumber = function (limit) {
+  return Math.floor(Math.random() * limit);
+};
+
 const getNewFood = function (width, height, score) {
-  const colId = Math.floor(Math.random() * width);
-  const rowId = Math.floor(Math.random() * height);
+  const colId = randomNumber(width);
+  const rowId = randomNumber(height);
   const [type, points] = score % 45 === 0 ? ['special', 20] : ['normal', 5];
   return new Food(colId, rowId, type, points);
 }
 
 class Game {
-  constructor(size, snake, food) {
+  constructor(size, snake, ghostSnake, food) {
     [this.width, this.height] = size;
     this.snake = snake;
+    this.ghostSnake = ghostSnake;
     this.food = food;
     this.score = 0
   }
@@ -32,23 +37,35 @@ class Game {
   state() {
     return {
       snake: this.snake.state(),
+      ghostSnake: this.ghostSnake.state(),
       food: this.food.state(),
       score: this.score
     }
   }
 
-  turnSnake(turnDirection) {
-    const { direction } = this.snake.head();
+  randomTurn(snake) {
+    if (randomNumber(10) > 5) {
+      const direction = randomNumber(4);
+      this.turnSnake(snake, direction);
+    }
+    if (snake.isOutOfBoundary(4, 4, this.width - 4, this.height - 4)) {
+      snake.turnRight();
+      snake.turnRight();
+    }
+  }
+
+  turnSnake(snake, turnDirection) {
+    const { direction } = snake.head();
     if (direction === ((turnDirection + 3) % 4)) {
-      this.snake.turnLeft();
+      snake.turnLeft();
     }
     if (direction === ((turnDirection + 1) % 4)) {
-      this.snake.turnRight();
+      snake.turnRight();
     }
   }
 
   isOver() {
-    return this.snake.isOnLine(this.width, this.height) || this.snake.isBodyTouch();
+    return this.snake.isOutOfBoundary(0, 0, this.width, this.height) || this.snake.isBodyTouch();
   }
 
   update() {
@@ -61,5 +78,7 @@ class Game {
       this.score += food.points;
     }
     this.snake.move();
+    this.ghostSnake.move();
+    this.randomTurn(this.ghostSnake);
   }
 }

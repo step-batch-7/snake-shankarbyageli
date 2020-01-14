@@ -58,10 +58,10 @@ class Snake {
     return false;
   }
 
-  isOnLine(width, height) {
+  isOutOfBoundary(startX, startY, width, height) {
     const head = this.head().position;
-    const isTouchedSides = isNotInRange(head[0], [0, width - 1]);
-    const isTouchedTopDown = isNotInRange(head[1], [0, height - 1]);
+    const isTouchedSides = isNotInRange(head[0], [startX, width - 1]);
+    const isTouchedTopDown = isNotInRange(head[1], [startY, height - 1]);
     return isTouchedSides || isTouchedTopDown;
   }
 }

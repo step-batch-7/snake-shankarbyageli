@@ -27,24 +27,29 @@ const createGrids = function ([width, height], GRID_ID) {
   }
 };
 
-const eraseFoodAndTail = function (game) {
-  let [colId, rowId] = game.snake.tail;
-  let cell = getCell(colId, rowId);
-  cell.classList.remove(game.snake.type);
-
-  [colId, rowId] = game.food.position;
-  cell = getCell(colId, rowId);
-  cell.classList.remove(game.food.type);
+const eraseTail = function (snake) {
+  const [colId, rowId] = snake.tail;
+  const cell = getCell(colId, rowId);
+  cell.classList.remove(snake.type);
 };
 
-const drawSnakeAndFood = function (game) {
-  game.snake.position.forEach(([colId, rowId]) => {
-    const cell = getCell(colId, rowId);
-    cell.classList.add(game.snake.type);
-  });
-  const [colId, rowId] = game.food.position;
+const eraseFood = function (food) {
+  const [colId, rowId] = food.position;
   const cell = getCell(colId, rowId);
-  cell.classList.add(game.food.type);
+  cell.classList.remove(food.type);
+};
+
+const drawFood = function (food) {
+  const [colId, rowId] = food.position;
+  const cell = getCell(colId, rowId);
+  cell.classList.add(food.type);
+};
+
+const drawSnake = function (snake) {
+  snake.position.forEach(([colId, rowId]) => {
+    const cell = getCell(colId, rowId);
+    cell.classList.add(snake.type);
+  });
 };
 
 const handleKeyPress = game => {
@@ -54,7 +59,7 @@ const handleKeyPress = game => {
     'ArrowRight': EAST,
     'ArrowLeft': WEST
   }
-  game.turnSnake(moves[event.key]);
+  game.turnSnake(game.snake, moves[event.key]);
 };
 
 const attachEventListeners = game => {
@@ -63,7 +68,14 @@ const attachEventListeners = game => {
 
 const displayScore = function (score) {
   document.getElementById('score').innerText = `Score : ${score}`;
-}
+};
+
+const drawGame = function (game) {
+  displayScore(game.score);
+  drawFood(game.food);
+  drawSnake(game.snake);
+  drawSnake(game.ghostSnake);
+};
 
 const gameLoop = function (game, interval) {
   const gameState = game.state();
@@ -71,22 +83,22 @@ const gameLoop = function (game, interval) {
     clearInterval(interval);
     alert("Game Over!")
   }
-  eraseFoodAndTail(gameState);
+  eraseFood(gameState.food);
+  eraseTail(gameState.snake);
+  eraseTail(gameState.ghostSnake);
   game.update();
   const newState = game.state();
-  displayScore(newState.score);
-  drawSnakeAndFood(newState);
+  drawGame(newState);
 };
 
 const setup = (game, GRID_ID) => {
-  const gameState = game.state()
+  const gameState = game.state();
   attachEventListeners(game);
   createGrids(game.size, GRID_ID);
-  drawSnakeAndFood(gameState);
+  drawGame(gameState);
 };
 
-const main = function () {
-  const GRID_ID = 'grid';
+const initSnake = function () {
   const snake = new Snake(
     [
       [40, 25],
@@ -96,10 +108,31 @@ const main = function () {
     new Direction(EAST),
     'snake'
   );
+  return snake;
+}
+
+const initGhostSnake = function () {
+  const ghostSnake = new Snake(
+    [
+      [60, 25],
+      [61, 25],
+      [62, 25],
+      [63, 25]
+    ],
+    new Direction(EAST),
+    'ghost'
+  );
+  return ghostSnake;
+}
+
+const main = function () {
+  const GRID_ID = 'grid';
   const food = new Food(10, 10, 'normal', 5);
-  const game = new Game([100, 60], snake, food);
+  const snake = initSnake();
+  const ghostSnake = initGhostSnake();
+  const game = new Game([100, 60], snake, ghostSnake, food);
   setup(game, GRID_ID);
   const gameInterval = setInterval(() => {
     gameLoop(game, gameInterval);
-  }, 100);
+  }, 150);
 };
