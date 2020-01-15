@@ -28,22 +28,10 @@ h1 {
   background-color: red;
 }
 
-@keyframes special {
-  0% {
-    background-color: green;
-    border-radius: 50%;
-  }
-  100% {
-    background-color: green;
-    border-radius: 50%;
-    box-shadow: 0 0 0 4px green;
-  }
-}
-
 .special {
   background-color: green;
   border-radius: 50%;
-  box-shadow: 0 0 0 4px green;
+  box-shadow: 0 0 0 3px green;
 }
 
 #score {

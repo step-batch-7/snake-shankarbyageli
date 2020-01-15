@@ -14,13 +14,6 @@ const randomNumber = function (limit) {
   return Math.floor(Math.random() * limit);
 };
 
-const getNewFood = function (width, height, score) {
-  const colId = randomNumber(width);
-  const rowId = randomNumber(height);
-  const [type, points] = score % 45 === 0 ? ['special', 20] : ['normal', 5];
-  return new Food(colId, rowId, type, points);
-}
-
 class Game {
   constructor(size, snake, ghostSnake, food) {
     [this.width, this.height] = size;
@@ -41,6 +34,13 @@ class Game {
       food: this.food.state(),
       score: this.score
     }
+  }
+
+  generateFood() {
+    const colId = randomNumber(this.width);
+    const rowId = randomNumber(this.height);
+    const [type, points] = this.score % 45 === 0 ? ['special', 20] : ['normal', 5];
+    return new Food(colId, rowId, type, points);
   }
 
   randomTurn(snake) {
@@ -64,7 +64,7 @@ class Game {
     }
   }
 
-  areSnakesCollided() {
+  haveSnakesCollided() {
     const ghostTouch = this.snake.state().position.some(position => {
       return arePositionsEqual(this.ghostSnake.head().position, position);
     });
@@ -77,13 +77,13 @@ class Game {
   isOver() {
     return this.snake.isOutOfBoundary(0, 0, this.width, this.height) ||
       this.snake.isBodyTouch() ||
-      this.areSnakesCollided();
+      this.haveSnakesCollided();
   }
 
   update() {
     const food = this.food.state();
     if (this.snake.ateFood(food.position)) {
-      this.food = getNewFood(this.width, this.height, this.score);
+      this.food = this.generateFood();
       if (food.type === 'normal') {
         this.snake.grow();
       }
