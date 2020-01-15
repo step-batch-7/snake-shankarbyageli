@@ -16,13 +16,14 @@ h1 {
 }
 
 .snake {
+  border-radius: 25%;
   background-color: black;
 }
 
 .ghost {
   background-color: gray;
 }
- 
+
 .normal {
   background-color: red;
 }
@@ -40,7 +41,9 @@ h1 {
 }
 
 .special {
-  animation: special 2s linear 0s infinite;
+  background-color: green;
+  border-radius: 50%;
+  box-shadow: 0 0 0 4px green;
 }
 
 #score {

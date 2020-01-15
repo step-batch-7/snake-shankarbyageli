@@ -64,8 +64,20 @@ class Game {
     }
   }
 
+  areSnakesCollided() {
+    const ghostTouch = this.snake.state().position.some(position => {
+      return arePositionsEqual(this.ghostSnake.head().position, position);
+    });
+    const snakeTouch = this.ghostSnake.state().position.some(position => {
+      return arePositionsEqual(this.snake.head().position, position);
+    });
+    return ghostTouch || snakeTouch;
+  }
+
   isOver() {
-    return this.snake.isOutOfBoundary(0, 0, this.width, this.height) || this.snake.isBodyTouch();
+    return this.snake.isOutOfBoundary(0, 0, this.width, this.height) ||
+      this.snake.isBodyTouch() ||
+      this.areSnakesCollided();
   }
 
   update() {
