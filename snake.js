@@ -48,6 +48,12 @@ class Snake {
     this.positions.push(tail);
   }
 
+  isHeadOn(positions) {
+    return positions.some(position => {
+      return arePositionsEqual(this.head().position, position)
+    });
+  }
+
   isBodyTouch() {
     const head = this.positions[this.positions.length - 1];
     for (let idx = 0; idx < (this.positions.length - 1); idx++) {

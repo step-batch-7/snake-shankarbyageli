@@ -65,12 +65,10 @@ class Game {
   }
 
   haveSnakesCollided() {
-    const ghostTouch = this.snake.state().position.some(position => {
-      return arePositionsEqual(this.ghostSnake.head().position, position);
-    });
-    const snakeTouch = this.ghostSnake.state().position.some(position => {
-      return arePositionsEqual(this.snake.head().position, position);
-    });
+    const snake = this.snake.state();
+    const ghostSnake = this.ghostSnake.state();
+    const ghostTouch = this.ghostSnake.isHeadOn(snake.position);
+    const snakeTouch = this.snake.isHeadOn(ghostSnake.position);
     return ghostTouch || snakeTouch;
   }
 
