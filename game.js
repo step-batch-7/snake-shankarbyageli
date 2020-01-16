@@ -50,8 +50,8 @@ class Game {
   }
 
   randomTurn() {
-    const random = randomNumber(50);
-    if (random > 40) {
+    const random = randomNumber(10);
+    if (random > 7) {
       this.#ghostSnake.turnRight();
     }
     if (this.#ghostSnake.isOutOfBoundary(4, 4, this.#width - 4, this.#height - 4)) {

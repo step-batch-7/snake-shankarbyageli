@@ -86,7 +86,8 @@ const gameLoop = function (game, interval) {
   if (game.isOver()) {
     document.getElementsByTagName('button')[0].disabled = true;
     clearInterval(interval);
-    alert("Game Over!")
+    alert("Game Over!");
+    return;
   }
   eraseFood(gameState.food);
   eraseTail(gameState.snake);
