@@ -1,40 +1,44 @@
 'use strict';
 
 class Snake {
+  #positions;
+  #direction;
+  #type;
+  #previousTail;
   constructor(positions, direction, type) {
-    this.positions = positions.slice();
-    this.direction = direction;
-    this.type = type;
-    this.previousTail = [0, 0];
+    this.#positions = positions.slice();
+    this.#direction = direction;
+    this.#type = type;
+    this.#previousTail = [0, 0];
   }
 
   head() {
     return {
-      position: this.positions[this.positions.length - 1].slice(),
-      direction: this.direction.head
+      position: this.#positions[this.#positions.length - 1].slice(),
+      direction: this.#direction.head
     }
   }
 
   state() {
     const state = {
-      position: this.positions.slice(),
-      tail: this.previousTail.slice(),
-      type: this.type
+      position: this.#positions.slice(),
+      tail: this.#previousTail.slice(),
+      type: this.#type
     }
     return state;
   }
 
   turnLeft() {
-    this.direction.turnLeft();
+    this.#direction.turnLeft();
   }
 
   turnRight() {
-    this.direction.turnRight();
+    this.#direction.turnRight();
   }
 
   move() {
     this.grow();
-    this.previousTail = this.positions.shift();
+    this.#previousTail = this.#positions.shift();
   }
 
   ateFood(food) {
@@ -42,10 +46,10 @@ class Snake {
   }
 
   grow() {
-    const [headX, headY] = this.positions[this.positions.length - 1];
-    const [deltaX, deltaY] = this.direction.delta;
+    const [headX, headY] = this.#positions[this.#positions.length - 1];
+    const [deltaX, deltaY] = this.#direction.delta;
     const tail = [headX + deltaX, headY + deltaY];
-    this.positions.push(tail);
+    this.#positions.push(tail);
   }
 
   isHeadOn(positions) {
@@ -55,9 +59,9 @@ class Snake {
   }
 
   isBodyTouch() {
-    const head = this.positions[this.positions.length - 1];
-    for (let idx = 0; idx < (this.positions.length - 1); idx++) {
-      if (arePositionsEqual(head, this.positions[idx])) {
+    const head = this.#positions[this.#positions.length - 1];
+    for (let idx = 0; idx < (this.#positions.length - 1); idx++) {
+      if (arePositionsEqual(head, this.#positions[idx])) {
         return true;
       }
     }

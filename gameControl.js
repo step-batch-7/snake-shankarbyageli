@@ -59,11 +59,15 @@ const handleKeyPress = game => {
     'ArrowRight': EAST,
     'ArrowLeft': WEST
   }
-  game.turnSnake(game.snake, moves[event.key]);
+  game.turnSnake(moves[event.key]);
 };
 
 const attachEventListeners = game => {
   document.body.onkeydown = handleKeyPress.bind(null, game);
+};
+
+const pause = function () {
+  alert("Press OK to continue the game!");
 };
 
 const displayScore = function (score) {
@@ -80,6 +84,7 @@ const drawGame = function (game) {
 const gameLoop = function (game, interval) {
   const gameState = game.state();
   if (game.isOver()) {
+    document.getElementsByTagName('button')[0].disabled = true;
     clearInterval(interval);
     alert("Game Over!")
   }
